@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
-import BottomNav from '../../components/bottomNav';
 
 const MinhasReservas = () => {
   const [reservas, setReservas] = useState([]);
@@ -10,7 +10,7 @@ const MinhasReservas = () => {
   const [error, setError] = useState(null);
   const router = useRouter();
 
-  const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://test-back-7vih.onrender.com';
+  const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://scared-kristien-igoty1910-978c1b13.koyeb.app';
 
   useEffect(() => {
     const fetchReservas = async () => {
@@ -108,7 +108,10 @@ const MinhasReservas = () => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Icon name="arrow-back" size={28} color="#fff" />
+<Image
+            source={require("../../assets/images/voltarBtn.png")}
+            style={styles.backIcon}
+          />
         </TouchableOpacity>
         <Text style={styles.title}>Minhas Reservas</Text>
       </View>
@@ -123,7 +126,7 @@ const MinhasReservas = () => {
           reservas.map((reserva) => (
             <View style={styles.card} key={reserva.id}>
               <Image
-                source={{ uri: reserva.quarto?.imagem_url || 'https://via.placeholder.com/300x180' }}
+                source={{ uri: reserva.quarto?.imagem_url}}
                 style={styles.roomImage}
                 resizeMode="cover"
               />
@@ -137,7 +140,7 @@ const MinhasReservas = () => {
           ))
         )}
       </ScrollView>
-      <BottomNav />
+
     </View>
   );
 };
@@ -173,10 +176,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 18,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+    boxboxShadow: "0px 2px 4px rgba(0, 0, 0, 0.15)",
   },
   roomImage: {
     width: '100%',

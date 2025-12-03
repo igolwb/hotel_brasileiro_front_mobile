@@ -8,8 +8,11 @@ import {
   Image,
   ImageBackground,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { scale, verticalScale } from 'react-native-size-matters';
 import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -25,7 +28,7 @@ export default function Cadastro() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
-      const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   // Regex para validação de email e telefone
@@ -83,7 +86,7 @@ export default function Cadastro() {
     setShowPasswordRequirements(false);
   };
 
-const decodeToken = (token) => {
+  const decodeToken = (token) => {
     const base64Url = token.split(".")[1];
     const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
     const jsonPayload = decodeURIComponent(
@@ -93,10 +96,10 @@ const decodeToken = (token) => {
             .join("")
     );
     return JSON.parse(jsonPayload);
-};
+  };
 
   // Envia o formulário para criar um novo cliente
-const handleSubmit = async () => {
+  const handleSubmit = async () => {
     setError("");
     setSuccess("");
     setShowPasswordRequirements(false);
@@ -124,7 +127,7 @@ const handleSubmit = async () => {
     }
     setLoading(true);
     try {
-        const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://test-back-7vih.onrender.com";
+        const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://scared-kristien-igoty1910-978c1b13.koyeb.app";
         const response = await fetch(`${API_URL}/api/clientes`, {
             method: "POST",
             headers: {
@@ -157,181 +160,186 @@ const handleSubmit = async () => {
     } finally {
         setLoading(false);
     }
-};
-
+  };
 
   return (
-    <View style={{ flex: 1 }}>
-      {/* Imagem de topo */}
-      <View>
-        <ImageBackground
-          source={require("../../assets/images/imagemCadastro.png")}
-          style={styles.topImage}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={verticalScale(-57)} // adjust for your header height
+    >
+      <View style={{ flex: 1 }}>
+        {/* Imagem de topo */}
+        <View>
+          <ImageBackground
+            source={require("../../assets/images/imagemCadastro.png")}
+            style={styles.topImage}
+          >
+            <View style={styles.overlay} />
+          </ImageBackground>
+        </View>
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          style={{ backgroundColor: "#0B2A3A" }}
         >
-          <View style={styles.overlay} />
-        </ImageBackground>
-      </View>
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        style={{ backgroundColor: "#0B2A3A" }}
-      >
-        <View style={styles.formContainer}>
-          {/* Logo e nome do hotel */}
-          <View style={styles.headerRow}>
-            <Image
-              source={require("../../assets/images/Logo.png")}
-              style={styles.logo}
-            />
-          </View>
-        </View>
-        <View style={styles.inputs}>
-          {/* Campo Nome */}
-          <Text style={styles.label}>Nome</Text>
-          <View style={styles.inputWrapper}>
-            <Ionicons
-              name="person-outline"
-              size={15}
-              color="#000"
-              style={styles.icon}
-            />
-            <TextInput
-              style={[styles.input, { fontSize: 13 }]}
-              placeholder="Digite seu nome"
-              placeholderTextColor="#000"
-              value={nome}
-              onChangeText={handleNomeChange}
-            />
-          </View>
-
-          {/* Campo Email */}
-          <Text style={styles.label}>Email</Text>
-          <View style={styles.inputWrapper}>
-            <MaterialIcons
-              name="alternate-email"
-              size={15}
-              color="#000"
-              style={styles.icon}
-            />
-            <TextInput
-              style={[styles.input, { fontSize: 13, borderColor: emailRegex.test(email) || !email ? '#fff' : 'red', borderWidth: email && !emailRegex.test(email) ? 1 : 0 }]}
-              placeholder="Digite seu email"
-              placeholderTextColor="#000"
-              value={email}
-              onChangeText={handleEmailChange}
-              keyboardType="email-address"
-            />
-          </View>
-
-          {/* Campo Telefone */}
-          <Text style={styles.label}>Telefone</Text>
-          <View style={styles.inputWrapper}>
-            <Ionicons
-              name="call-outline"
-              size={15}
-              color="#000"
-              style={styles.icon}
-            />
-            <TextInput
-              style={[styles.input, { fontSize: 13, borderColor: phoneRegex.test(telefone) || !telefone ? '#fff' : 'red', borderWidth: telefone && !phoneRegex.test(telefone) ? 1 : 0 }]}
-              placeholder="Digite seu telefone"
-              placeholderTextColor="#000"
-              value={telefone}
-              onChangeText={handleTelefoneChange}
-              keyboardType="phone-pad"
-              maxLength={15}
-            />
-          </View>
-
-          {/* Campo Senha */}
-          <Text style={styles.label}>Senha</Text>
-          <View style={styles.inputWrapper}>
-            <MaterialIcons
-              name="lock-outline"
-              size={15}
-              color="#000"
-              style={styles.icon}
-            />
-            <TextInput
-              style={[styles.input, { fontSize: 13, borderColor: passwordRequirements.every(r => r.test(senha)) || !senha ? '#fff' : 'red', borderWidth: senha && !passwordRequirements.every(r => r.test(senha)) ? 1 : 0 }]}
-              placeholder="Digite sua senha"
-              placeholderTextColor="#000"
-              value={senha}
-              onChangeText={handleSenhaChange}
-              secureTextEntry={!showPassword}
-            />
-                        <TouchableOpacity
-                            onPress={() => setShowPassword((prev) => !prev)}
-                            style={{ marginLeft: 8 }}
-                        >
-                            <MaterialIcons
-                                name={showPassword ? "visibility-off" : "visibility"}
-                                size={20}
-                                color="#000"
-                            />
-                        </TouchableOpacity>
-          </View>
-
-          {/* Campo Confirme a Senha */}
-          <Text style={styles.label}>Confirme a senha</Text>
-          <View style={styles.inputWrapper}>
-            <MaterialIcons
-              name="lock-outline"
-              size={15}
-              color="#000"
-              style={styles.icon}
-            />
-            <TextInput
-              style={[styles.input, { fontSize: 13, borderColor: confirmSenha && senha !== confirmSenha ? 'red' : '#fff', borderWidth: confirmSenha && senha !== confirmSenha ? 1 : 0 }]}
-              placeholder="Confirme sua senha"
-              placeholderTextColor="#000"
-              value={confirmSenha}
-              onChangeText={handleConfirmSenhaChange}
-              secureTextEntry={!showPassword}
-            />
-                        <TouchableOpacity
-                            onPress={() => setShowPassword((prev) => !prev)}
-                            style={{ marginLeft: 8 }}
-                        >
-                            <MaterialIcons
-                                name={showPassword ? "visibility-off" : "visibility"}
-                                size={20}
-                                color="#000"
-                            />
-                        </TouchableOpacity>
-          </View>
-
-          {/* Lista de requisitos da senha só após submit */}
-          {showPasswordRequirements && senha && passwordRequirements.some(r => !r.test(senha)) && (
-            <View style={{ marginVertical: 8, marginLeft: 8 }}>
-              {passwordRequirements.map((r, idx) => (
-                <Text key={idx} style={{ color: 'red', opacity: r.test(senha) ? 0.5 : 1, fontSize: 13 }}>
-                  • {r.label}
-                </Text>
-              ))}
+          <View style={styles.formContainer}>
+            {/* Logo e nome do hotel */}
+            <View style={styles.headerRow}>
+              <Image
+                source={require("../../assets/images/Logo.png")}
+                style={styles.logo}
+              />
             </View>
-          )}
+          </View>
+          <View style={styles.inputs}>
+            {/* Campo Nome */}
+            <Text style={styles.label}>Nome</Text>
+            <View style={styles.inputWrapper}>
+              <Ionicons
+                name="person-outline"
+                size={scale(14)}
+                color="#000"
+                style={styles.icon}
+              />
+              <TextInput
+                style={[styles.input, { fontSize: scale(12) }]}
+                placeholder="Digite seu nome"
+                placeholderTextColor="#000"
+                value={nome}
+                onChangeText={handleNomeChange}
+              />
+            </View>
 
-          {/* Mensagens de erro e sucesso */}
-          {error ? (
-            <Text style={{ color: 'red', textAlign: 'center', marginVertical: 8 }}>{error}</Text>
-          ) : null}
-          {success ? (
-            <Text style={{ color: 'green', textAlign: 'center', marginVertical: 8 }}>{success}</Text>
-          ) : null}
-        </View>
-        {/* Botão Criar Conta */}
-        <TouchableOpacity onPress={handleSubmit} style={styles.button} disabled={loading}>
-          <Text style={styles.buttonText}>{loading ? 'Cadastrando...' : 'Criar conta'}</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
+            {/* Campo Email */}
+            <Text style={styles.label}>Email</Text>
+            <View style={styles.inputWrapper}>
+              <MaterialIcons
+                name="alternate-email"
+                size={scale(14)}
+                color="#000"
+                style={styles.icon}
+              />
+              <TextInput
+                style={[styles.input, { fontSize: scale(12), borderColor: emailRegex.test(email) || !email ? '#fff' : 'red', borderWidth: email && !emailRegex.test(email) ? 1 : 0 }]}
+                placeholder="Digite seu email"
+                placeholderTextColor="#000"
+                value={email}
+                onChangeText={handleEmailChange}
+                keyboardType="email-address"
+              />
+            </View>
+
+            {/* Campo Telefone */}
+            <Text style={styles.label}>Telefone</Text>
+            <View style={styles.inputWrapper}>
+              <Ionicons
+                name="call-outline"
+                size={scale(14)}
+                color="#000"
+                style={styles.icon}
+              />
+              <TextInput
+                style={[styles.input, { fontSize: scale(12), borderColor: phoneRegex.test(telefone) || !telefone ? '#fff' : 'red', borderWidth: telefone && !phoneRegex.test(telefone) ? 1 : 0 }]}
+                placeholder="Digite seu telefone"
+                placeholderTextColor="#000"
+                value={telefone}
+                onChangeText={handleTelefoneChange}
+                keyboardType="phone-pad"
+                maxLength={15}
+              />
+            </View>
+
+            {/* Campo Senha */}
+            <Text style={styles.label}>Senha</Text>
+            <View style={styles.inputWrapper}>
+              <MaterialIcons
+                name="lock-outline"
+                size={scale(14)}
+                color="#000"
+                style={styles.icon}
+              />
+              <TextInput
+                style={[styles.input, { fontSize: scale(12), borderColor: passwordRequirements.every(r => r.test(senha)) || !senha ? '#fff' : 'red', borderWidth: senha && !passwordRequirements.every(r => r.test(senha)) ? 1 : 0 }]}
+                placeholder="Digite sua senha"
+                placeholderTextColor="#000"
+                value={senha}
+                onChangeText={handleSenhaChange}
+                secureTextEntry={!showPassword}
+              />
+              <TouchableOpacity
+                onPress={() => setShowPassword((prev) => !prev)}
+                style={{ marginLeft: scale(8) }}
+              >
+                <MaterialIcons
+                  name={showPassword ? "visibility-off" : "visibility"}
+                  size={scale(20)}
+                  color="#000"
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* Campo Confirme a Senha */}
+            <Text style={styles.label}>Confirme a senha</Text>
+            <View style={styles.inputWrapper}>
+              <MaterialIcons
+                name="lock-outline"
+                size={scale(14)}
+                color="#000"
+                style={styles.icon}
+              />
+              <TextInput
+                style={[styles.input, { fontSize: scale(12), borderColor: confirmSenha && senha !== confirmSenha ? 'red' : '#fff', borderWidth: confirmSenha && senha !== confirmSenha ? 1 : 0 }]}
+                placeholder="Confirme sua senha"
+                placeholderTextColor="#000"
+                value={confirmSenha}
+                onChangeText={handleConfirmSenhaChange}
+                secureTextEntry={!showPassword}
+              />
+              <TouchableOpacity
+                onPress={() => setShowPassword((prev) => !prev)}
+                style={{ marginLeft: scale(8) }}
+              >
+                <MaterialIcons
+                  name={showPassword ? "visibility-off" : "visibility"}
+                  size={scale(20)}
+                  color="#000"
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* Lista de requisitos da senha só após submit */}
+            {showPasswordRequirements && senha && passwordRequirements.some(r => !r.test(senha)) && (
+              <View style={{ marginVertical: verticalScale(8), marginLeft: scale(8) }}>
+                {passwordRequirements.map((r, idx) => (
+                  <Text key={idx} style={{ color: 'red', opacity: r.test(senha) ? 0.5 : 1, fontSize: scale(13) }}>
+                    • {r.label}
+                  </Text>
+                ))}
+              </View>
+            )}
+
+            {/* Mensagens de erro e sucesso */}
+            {error ? (
+              <Text style={{ color: 'red', textAlign: 'center', marginVertical: verticalScale(8) }}>{error}</Text>
+            ) : null}
+            {success ? (
+              <Text style={{ color: 'green', textAlign: 'center', marginVertical: verticalScale(8) }}>{success}</Text>
+            ) : null}
+          </View>
+          {/* Botão Criar Conta */}
+          <TouchableOpacity onPress={handleSubmit} style={styles.button} disabled={loading}>
+            <Text style={styles.buttonText}>{loading ? 'Cadastrando...' : 'Criar conta'}</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   topImage: {
-    width: "100%",
-    height: 300,
+    width: scale(350),
+    height: verticalScale(200),
     resizeMode: "cover",
   },
   overlay: {
@@ -341,72 +349,68 @@ const styles = StyleSheet.create({
   formContainer: {
     flex: 1,
     backgroundColor: "#0B2A3A",
-    padding: 20,
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
-    marginTop: -60,
-    paddingTop: 40,
+    padding: scale(20),
+    borderTopLeftRadius: scale(25),
+    borderTopRightRadius: scale(25),
+    marginTop: verticalScale(-60),
+    marginBottom: verticalScale(10),
+    paddingTop: verticalScale(40),
+    pardingBottom: verticalScale(-10),
   },
   inputs: {
-    padding: 15,
+    padding: scale(15),
     backgroundColor: "#0B2A3A",
-    marginTop: -600,
-    marginBottom: -20,
+    marginTop: verticalScale(-70),
+    marginBottom: verticalScale(-20),
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: verticalScale(20),
   },
   logo: {
-    width: 167,
-    height: 170,
+    width: scale(100),
+    height: verticalScale(100),
     resizeMode: "contain",
-    marginRight: 10,
-  },
-  headerText: {
-    color: "#fff",
-    fontWeight: "medium",
-    fontSize: 22,
-    lineHeight: 24,
+    marginRight: scale(10),
   },
   label: {
     color: "#fff",
-    fontSize: 16,
-    marginBottom: 4,
-    marginLeft: 2,
-    fontWeight: "Light",
+    fontSize: scale(12),
+    marginBottom: verticalScale(4),
+    marginLeft: scale(2),
+    fontWeight: "600",
   },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#fff",
-    borderRadius: 15.08,
-    marginBottom: 22,
-    paddingHorizontal: 12,
+    borderRadius: scale(15.08),
+    marginBottom: verticalScale(22),
+    paddingHorizontal: scale(12),
   },
   icon: {
-    marginRight: 8,
+    marginRight: scale(8),
   },
   input: {
     flex: 1,
     backgroundColor: "transparent",
-    borderRadius: 10,
-    paddingVertical: 12,
-    fontSize: 16,
+    borderRadius: scale(10),
+    paddingVertical: verticalScale(7),
+    fontSize: scale(12),
   },
   button: {
     backgroundColor: "#006494",
-    paddingVertical: 13,
-    borderRadius: 14,
+    paddingVertical: verticalScale(9),
+    borderRadius: scale(14),
     alignItems: "center",
-    marginTop: 20,
-    marginBottom: 70,
-    marginHorizontal: 15,
+    marginTop: verticalScale(10),
+    marginBottom: verticalScale(40),
+    marginHorizontal: scale(15),
   },
   buttonText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: scale(12),
     fontWeight: "bold",
   },
 });

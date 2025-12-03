@@ -8,9 +8,12 @@ import {
     Image,
     ImageBackground,
     ScrollView,
+    KeyboardAvoidingView,
+    Platform
 } from "react-native";
 import { useRouter } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
+import { scale, verticalScale } from 'react-native-size-matters';
 import handleLogin from "../../services/handleLogin";
 
 // Componente principal da tela de login
@@ -28,7 +31,12 @@ export default function Login() {
   };
 
     return (
-        <View style={{ flex: 1 }}>
+        <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={verticalScale(-167)} // Adjusted offset for header height
+    >
+      <View style={{ flex: 1 }}>
             {/* Imagem de topo */}
             <View>
                 <ImageBackground
@@ -40,6 +48,7 @@ export default function Login() {
             </View>
             <ScrollView
                 contentContainerStyle={{ flexGrow: 1 }}
+                keyboardShouldPersistTaps="handled" // Ensures taps dismiss the keyboard
                 style={{ backgroundColor: "#0B2A3A" }}
             >
                 <View style={styles.formContainer}>
@@ -124,13 +133,14 @@ export default function Login() {
                 </TouchableOpacity>
             </ScrollView>
         </View>
+        </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
     topImage: {
-        width: "100%",
-        height: 420,
+        width: scale(350),
+        height: verticalScale(250),
         resizeMode: "cover",
     },
     overlay: {
@@ -139,7 +149,7 @@ const styles = StyleSheet.create({
     },
     texto: {
         color: "#fff",
-        fontSize: 13,
+        fontSize: scale(12),
         fontWeight: "semibold",
         textAlign: "right",
         marginRight: 20,
@@ -149,12 +159,12 @@ const styles = StyleSheet.create({
         backgroundColor: "#0B2A3A",
         padding: 20,
         marginTop: -60,
-        paddingTop: 40,
+        paddingTop: verticalScale(25),
     },
     inputs: {
         padding: 15,
         backgroundColor: "#0B2A3A",
-        marginTop: -100,
+        marginTop: verticalScale(-40),
         marginBottom: -20,
     },
     headerRow: {
@@ -163,20 +173,14 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     logo: {
-        width: 167,
-        height: 170,
+        width: scale(100),
+        height: verticalScale(100),
         resizeMode: "contain",
         marginRight: 10,
     },
-    headerText: {
-        color: "#fff",
-        fontWeight: "medium",
-        fontSize: 22,
-        lineHeight: 26,
-    },
     label: {
         color: "#fff",
-        fontSize: 16,
+        fontSize: scale(13),
         fontWeight: "600",
         marginBottom: 4,
         marginLeft: 2,
@@ -196,34 +200,26 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "transparent",
         borderRadius: 10,
-        paddingVertical: 12,
-        fontSize: 13,
+        paddingVertical: verticalScale(7),
+        fontSize: scale(12),
     },
     button: {
         backgroundColor: "#006494",
-        paddingVertical: 13,
+        paddingVertical: verticalScale(10),
         borderRadius: 14,
         alignItems: "center",
         marginTop: 20,
-        marginBottom: 170,
+        marginBottom: verticalScale(177),
         marginHorizontal: 14,
     },
     buttonText: {
         color: "#fff",
-        fontSize: 16,
+        fontSize: scale(15),
         fontWeight: "bold",
     },
     forgotPasswordContainer: {
         alignItems: 'flex-end',
         paddingRight: 20,
         marginBottom: 10,
-    },
-    forgotPasswordText: {
-        color: '#fff',
-        fontSize: 14,
-        fontWeight: '500',
-    },
-    sa: {
-        // Adicione estilo para o botão de recuperar senha se quiser
     },
 });

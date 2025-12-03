@@ -21,7 +21,7 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
         {/*  Fluxo principal (tabs) */}
-        <Stack.Screen name="(tabs)/index" />
+        <Stack.Screen name="(tabs)" />
 
         {/*  Fluxo de autenticação */}
         <Stack.Screen name="auth/Login" />
@@ -30,15 +30,13 @@ export default function RootLayout() {
         <Stack.Screen name="auth/pwconfirm" />
         <Stack.Screen name="home/home" />
         <Stack.Screen name="chat/chatPage" />
-        <Stack.Screen name="reservas/quartoDesc" />
-        <Stack.Screen name="reservas/reserva"/>
-        <Stack.Screen name="reservas/reservaConfirm" />
+        <Stack.Screen name="reservas/[id]" />
+        <Stack.Screen name="reservas/reserva" />
         <Stack.Screen name="reservas/reservaFinish" />
-        <Stack.Screen name="user/userPage" />
-        <Stack.Screen name="user/changepw" />
+        <Stack.Screen name="user/[UserId]" />
+        <Stack.Screen name="user/changePw" />
         <Stack.Screen name="user/pwCode" />
         <Stack.Screen name="user/confirmNewPw" />
-        
 
         {/*  Página de erro */}
         <Stack.Screen name="+not-found" />

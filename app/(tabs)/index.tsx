@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -42,10 +43,10 @@ export default function HomeScreen() {
         <View style={styles.buttonsContainer}>
           {/* Ir para Login */}
           <TouchableOpacity
-            style={styles.button}
+            style={styles.buttonLogin}
             onPress={() => router.push("/auth/Login")}
           >
-            <Text style={styles.buttonText}>Prosseguir para login</Text>
+            <Text style={styles.buttonLoginText}>Prosseguir para login</Text>
           </TouchableOpacity>
 
           {/* Ir para Cadastro */}
@@ -63,6 +64,8 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   background: {
+    width: scale(350),
+    height: verticalScale(700),
     flex: 1,
     resizeMode: "cover",
     justifyContent: "center",
@@ -93,27 +96,28 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    width: 200,
-    height: 200,
+    width: scale(150),
+    height: verticalScale(150),
+    marginLeft: scale(15),
     resizeMode: "contain",
   },
 
   starsContainer: {
     flexDirection: "row",
     marginBottom: 20,
-    marginTop: -50, // Ajuste para descer as estrelas
+    marginTop: scale(-35), // Ajuste para descer as estrelas
     gap: 8,
     marginLeft: 35,
   },
 
   star: {
-    width: 25,
-    height: 25,
+    width: scale(19),
+    height: verticalScale(19),
     marginHorizontal: 2,
   },
 
   slogan: {
-    fontSize: 24,
+    fontSize: scale(16),
     color: "#fff",
     textAlign: "center",
     marginBottom: 10,
@@ -121,38 +125,39 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: scale(13),
     color: "#ddd",
     textAlign: "center",
     marginBottom: 40,
     fontWeight: "500",
   },
-  button: {
+  buttonLogin: {
     backgroundColor: "#006494",
-    paddingVertical: 12,
+    paddingVertical: verticalScale(8),
     borderRadius: 12,
     width: "100%",
     alignItems: "center",
     marginBottom: 12,
   },
-  buttonText: {
+  buttonLoginText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: scale(14),
     fontWeight: "bold",
 
   },
   buttonRegister: {
     backgroundColor: "#00405C",
-    paddingVertical: 12,
+    paddingVertical: verticalScale(8),
     borderRadius: 12,
     width: "100%",
     alignItems: "center",
+    marginBottom: scale(35),
   },
 
   
   buttonTextRegister: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: scale(14),
     fontWeight: "bold",
   },
 

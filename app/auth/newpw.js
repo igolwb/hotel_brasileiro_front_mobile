@@ -37,7 +37,7 @@ export default function Login() {
         try {
             // Debug log: show email and senha being sent
             console.log("Enviando para backend:", { email, senha });
-            const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://test-back-7vih.onrender.com";
+            const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://scared-kristien-igoty1910-978c1b13.koyeb.app";
             const response = await fetch(`${API_URL}/api/clientes/update-password`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

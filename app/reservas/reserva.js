@@ -9,13 +9,15 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  Platform,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import BottomNav from '../../components/bottomNav';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Linking from 'expo-linking';
 
 export default function ReservaPage() {
-  const router = useRouter();
   const { id } = useLocalSearchParams();
 
   const [quarto, setQuarto] = useState(null);
@@ -25,11 +27,15 @@ export default function ReservaPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Date picker visibility
+  const [showCheckInPicker, setShowCheckInPicker] = useState(false);
+  const [showCheckOutPicker, setShowCheckOutPicker] = useState(false);
+
   useEffect(() => {
     if (id) {
       const fetchQuarto = async () => {
         try {
-          const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://test-back-7vih.onrender.com';
+          const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://scared-kristien-igoty1910-978c1b13.koyeb.app';
           const token = await AsyncStorage.getItem('authToken');
           const response = await fetch(`${API_URL}/api/quartos/${id}`, {
             headers: {
@@ -53,34 +59,11 @@ export default function ReservaPage() {
     }
   }, [id]);
 
-  const formatInputDate = (text) => {
-    const cleaned = text.replace(/\D/g, '');
-    const length = cleaned.length;
-
-    if (length <= 2) {
-      return cleaned;
-    }
-    if (length <= 4) {
-      return `${cleaned.slice(0, 2)}/${cleaned.slice(2)}`;
-    }
-    return `${cleaned.slice(0, 2)}/${cleaned.slice(2, 4)}/${cleaned.slice(4, 8)}`;
-  };
-
-  const handleCheckInChange = (text) => {
-    const formattedDate = formatInputDate(text);
-    setCheckInDate(formattedDate);
-  };
-
-  const handleCheckOutChange = (text) => {
-    const formattedDate = formatInputDate(text);
-    setCheckOutDate(formattedDate);
-  };
-
+  // Util functions
   const parseDate = (dateString) => {
-      const [day, month, year] = dateString.split('/');
-      // Month is 0-indexed in JavaScript Dates
-      return new Date(year, month - 1, day);
-  }
+    const [day, month, year] = dateString.split('/');
+    return new Date(year, month - 1, day);
+  };
 
   const getDiarias = () => {
     if (!checkInDate || !checkOutDate || checkInDate.length < 10 || checkOutDate.length < 10) return 0;
@@ -95,15 +78,35 @@ export default function ReservaPage() {
   const diarias = getDiarias();
   const total = quarto && diarias > 0 ? Number(quarto.preco) * diarias : 0;
 
-  const handleReserva = () => {
+  // Handle date selection
+  const handleCheckInChange = (event, selectedDate) => {
+    setShowCheckInPicker(false);
+    if (selectedDate) {
+      const formatted = selectedDate.toLocaleDateString('pt-BR');
+      setCheckInDate(formatted);
+      // Auto-adjust checkout if earlier than check-in
+      if (checkOutDate && parseDate(checkOutDate) <= selectedDate) {
+        setCheckOutDate('');
+      }
+    }
+  };
+
+  const handleCheckOutChange = (event, selectedDate) => {
+    setShowCheckOutPicker(false);
+    if (selectedDate) {
+      const formatted = selectedDate.toLocaleDateString('pt-BR');
+      setCheckOutDate(formatted);
+    }
+  };
+
+  const handlePaymentCheckout = async () => {
     if (!checkInDate || !checkOutDate || !guests || checkInDate.length < 10 || checkOutDate.length < 10) {
-      Alert.alert('Erro', 'Preencha todos os campos no formato DD/MM/AAAA!');
+      Alert.alert('Erro', 'Preencha todos os campos!');
       return;
     }
 
     const dataInicio = parseDate(checkInDate);
-    const dataFim = parseDate(checkOutDate)
-
+    const dataFim = parseDate(checkOutDate);
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
 
@@ -113,32 +116,96 @@ export default function ReservaPage() {
     }
 
     if (dataInicio >= dataFim) {
-        Alert.alert('Erro', 'A data de início deve ser anterior à data de fim.');
-        return;
+      Alert.alert('Erro', 'A data de início deve ser anterior à data de fim.');
+      return;
     }
 
-    const [dayIn, monthIn, yearIn] = checkInDate.split('/');
-    const inicioISO = `${yearIn}-${monthIn}-${dayIn}`;
+    try {
+      const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://scared-kristien-igoty1910-978c1b13.koyeb.app';
+      const token = await AsyncStorage.getItem('authToken');
 
-    const [dayOut, monthOut, yearOut] = checkOutDate.split('/');
-    const fimISO = `${yearOut}-${monthOut}-${dayOut}`;
+      // Step 1: Create reservation in the database
+      const res = await fetch(`${API_URL}/api/reservas`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          quarto_id: id,
+          hospedes: guests,
+          inicio: `${dataInicio.toISOString().split('T')[0]}`,
+          fim: `${dataFim.toISOString().split('T')[0]}`,
+        }),
+      });
 
-    const reservaDetails = {
-      quartoId: id,
-      quartoNome: quarto.nome,
-      quartoImage: quarto.imagem_url,
-      checkInDate: checkInDate, // DD/MM/YYYY for display
-      checkOutDate: checkOutDate, // DD/MM/YYYY for display
-      checkInDateISO: inicioISO, // YYYY-MM-DD for API
-      checkOutDateISO: fimISO, // YYYY-MM-DD for API
-      guests,
-      preco: total.toFixed(2),
-    };
+      if (!res.ok) {
+        const err = await res.json();
+        Alert.alert('Erro', err.error || 'Erro ao criar reserva');
+        return;
+      }
 
-    router.push({
-      pathname: '/reservas/reservaConfirm',
-      params: reservaDetails,
-    });
+      const reservaData = await res.json();
+
+      // Step 2: Proceed to payment checkout
+      const items = [
+        {
+          name: quarto.nome,
+          quantity: 1,
+          unit_amount: Math.round(total * 100), // centavos
+        },
+      ];
+
+      const customer = {
+        name: 'Cliente',
+        email: 'cliente@teste.com',
+        tax_id: '12345678909',
+        phones: [
+          { country: '55', area: '11', number: '999999999', type: 'MOBILE' },
+        ],
+      };
+
+const redirectUrls = {
+  success: 'hotelbrasileiro://reservas/reservaFinish',
+  failure: 'hotelbrasileiro://reservas/reservaFinish',
+};
+
+      const paymentRes = await fetch(`${API_URL}/api/payments/create-checkout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          referenceId: `reserva_${reservaData.data?.id || id}`,
+          customer,
+          items,
+          redirectUrls,
+        }),
+      });
+
+      const paymentData = await paymentRes.json();
+
+      if (paymentData.success && paymentData.checkoutUrl) {
+        Linking.openURL(paymentData.checkoutUrl);
+      } else {
+        Alert.alert('Erro', 'Erro ao iniciar o pagamento.');
+        console.error('Checkout error:', paymentData);
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Erro ao criar reserva ou checkout.');
+      console.error(error);
+    }
+  };
+
+  // Update the handleReserva function to call handlePaymentCheckout
+  const handleReserva = () => {
+    if (!checkInDate || !checkOutDate || !guests || checkInDate.length < 10 || checkOutDate.length < 10) {
+      Alert.alert('Erro', 'Preencha todos os campos!');
+      return;
+    }
+
+    handlePaymentCheckout();
   };
 
   if (loading) {
@@ -159,167 +226,194 @@ export default function ReservaPage() {
 
   return (
     <View style={styles.container}>
-        <Image
-            source={{ uri: quarto.imagem_url }}
-            style={styles.imagem}
-            resizeMode="cover"
-        />
-        <ScrollView style={styles.info}>
-            <Text style={styles.titulo}>Escolha suas datas</Text>
+      <Image
+        source={{ uri: quarto.imagem_url }}
+        style={styles.imagem}
+        resizeMode="cover"
+      />
 
-            <Text style={styles.label}>Quando seu descanso começa?</Text>
+      <ScrollView style={styles.info}>
+        <Text style={styles.titulo}>Escolha suas datas</Text>
+
+        {/* Check-in */}
+        <Text style={styles.label}>Quando seu descanso começa?</Text>
+        <TouchableOpacity onPress={() => setShowCheckInPicker(true)}>
+          <View pointerEvents="none">
             <TextInput
-                style={styles.input}
-                placeholder="DD/MM/AAAA"
-                placeholderTextColor="#999"
-                value={checkInDate}
-                onChangeText={handleCheckInChange}
-                maxLength={10}
-                keyboardType="numeric"
+              style={styles.input}
+              placeholder="DD/MM/AAAA"
+              placeholderTextColor="#999"
+              value={checkInDate}
+              editable={false}
             />
+          </View>
+        </TouchableOpacity>
+        {showCheckInPicker && (
+          <DateTimePicker
+            value={checkInDate ? parseDate(checkInDate) : new Date()}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={handleCheckInChange}
+            minimumDate={new Date()}
+          />
+        )}
 
-            <Text style={styles.label}>Quando a saudade vai bater?</Text>
+        {/* Check-out */}
+        <Text style={styles.label}>Quando a saudade vai bater?</Text>
+        <TouchableOpacity onPress={() => setShowCheckOutPicker(true)}>
+          <View pointerEvents="none">
             <TextInput
-                style={styles.input}
-                placeholder="DD/MM/AAAA"
-                placeholderTextColor="#999"
-                value={checkOutDate}
-                onChangeText={handleCheckOutChange}
-                maxLength={10}
-                keyboardType="numeric"
+              style={styles.input}
+              placeholder="DD/MM/AAAA"
+              placeholderTextColor="#999"
+              value={checkOutDate}
+              editable={false}
             />
+          </View>
+        </TouchableOpacity>
+        {showCheckOutPicker && (
+          <DateTimePicker
+            value={checkOutDate ? parseDate(checkOutDate) : new Date()}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={handleCheckOutChange}
+            minimumDate={checkInDate ? parseDate(checkInDate) : new Date()}
+          />
+        )}
 
-            <Text style={styles.label}>Quantidade de pessoas</Text>
-            <View style={styles.counterContainer}>
-                <TouchableOpacity
-                    style={styles.circleButton}
-                    onPress={() => setGuests((prev) => Math.max(1, Number(prev) - 1))}
-                >
-                    <Text style={styles.circleIcon}>-</Text>
-                </TouchableOpacity>
+        {/* Guests */}
+        <Text style={styles.label}>Quantidade de pessoas</Text>
+        <View style={styles.counterContainer}>
+          <TouchableOpacity
+            style={styles.circleButton}
+            onPress={() => setGuests((prev) => Math.max(1, Number(prev) - 1))}
+          >
+            <Text style={styles.circleIcon}>-</Text>
+          </TouchableOpacity>
 
-                <Text style={styles.counterValue}>{guests}</Text>
+          <Text style={styles.counterValue}>{guests}</Text>
 
-                <TouchableOpacity
-                    style={styles.circleButton}
-                    onPress={() => setGuests((prev) => Math.min(10, Number(prev) + 1))}
-                >
-                    <Text style={styles.circleIcon}>+</Text>
-                </TouchableOpacity>
-            </View>
-            
-            {total > 0 && (
-                <Text style={styles.totalText}>
-                    Total: R$ {total.toFixed(2)} ({diarias} diárias)
-                </Text>
-            )}
+          <TouchableOpacity
+            style={styles.circleButton}
+            onPress={() => setGuests((prev) => Math.min(10, Number(prev) + 1))}
+          >
+            <Text style={styles.circleIcon}>+</Text>
+          </TouchableOpacity>
+        </View>
 
-            <TouchableOpacity onPress={handleReserva} style={styles.botao}>
-                <Text style={styles.textoBotao}>Reservar</Text>
-            </TouchableOpacity>
+        {total > 0 && (
+          <Text style={styles.totalText}>
+            Total: R$ {total.toFixed(2)} ({diarias} diárias)
+          </Text>
+        )}
+
+        <TouchableOpacity onPress={handleReserva} style={styles.botao}>
+          <Text style={styles.textoBotao}>Reservar</Text>
+        </TouchableOpacity>
       </ScrollView>
+
       <BottomNav />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#13293D',
-    },
-    center: {
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    errorText: {
-        color: '#fff',
-        fontSize: 18,
-    },
-    imagem: {
-        width: '100%',
-        height: '40%',
-    },
-    info: {
-        flex: 1,
-        backgroundColor: '#142c42',
-        padding: 20,
-        marginTop: -20,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-    },
-    titulo: {
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: 24,
-        marginBottom: 20,
-    },
-    label: {
-        color: '#E8F1F2',
-        fontSize: 16,
-        marginBottom: 6,
-        marginTop: 10,
-        fontWeight: '600',
-    },
-    input: {
-        backgroundColor: '#E8F1F2',
-        color: '#333',
-        padding: 12,
-        borderRadius: 15,
-        fontSize: 16,
-    },
-    counterContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        backgroundColor: "#006494",
-        borderRadius: 15,
-        paddingHorizontal: 16,
-        paddingVertical: 10,
-        marginBottom: 20,
-        marginTop: 5,
-    },
-    circleButton: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        backgroundColor: "#006494",
-        borderWidth: 2,
-        borderColor: "#fff",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    circleIcon: {
-        color: "#fff",
-        fontSize: 24,
-        fontWeight: "semibold",
-        textAlign: "center",
-        marginTop: -3.7,
-    },
-    counterValue: {
-        color: "#fff",
-        fontSize: 20,
-        fontWeight: "bold",
-        textAlign: "center",
-        minWidth: 40,
-    },
-    totalText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginTop: 5,
-        alignSelf: 'center',
-    },
-    botao: {
-        backgroundColor: '#006494',
-        borderRadius: 15,
-        paddingVertical: 10,
-        marginTop: 3,
-        alignItems: 'center',
-    },
-    textoBotao: {
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: 15,
-    },
+  container: {
+    flex: 1,
+    backgroundColor: '#13293D',
+  },
+  center: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorText: {
+    color: '#fff',
+    fontSize: 18,
+  },
+  imagem: {
+    width: '100%',
+    height: '40%',
+  },
+  info: {
+    flex: 1,
+    backgroundColor: '#142c42',
+    padding: 20,
+    marginTop: -20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  titulo: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 24,
+    marginBottom: 20,
+  },
+  label: {
+    color: '#E8F1F2',
+    fontSize: 16,
+    marginBottom: 6,
+    marginTop: 10,
+    fontWeight: '600',
+  },
+  input: {
+    backgroundColor: '#E8F1F2',
+    color: '#333',
+    padding: 12,
+    borderRadius: 15,
+    fontSize: 16,
+  },
+  counterContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#006494",
+    borderRadius: 15,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginBottom: 20,
+    marginTop: 5,
+  },
+  circleButton: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: "#006494",
+    borderWidth: 2,
+    borderColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  circleIcon: {
+    color: "#fff",
+    fontSize: 24,
+    fontWeight: "semibold",
+    textAlign: "center",
+    marginTop: -3.7,
+  },
+  counterValue: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    minWidth: 40,
+  },
+  totalText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 5,
+    alignSelf: 'center',
+  },
+  botao: {
+    backgroundColor: '#006494',
+    borderRadius: 15,
+    paddingVertical: 10,
+    marginTop: 3,
+    alignItems: 'center',
+  },
+  textoBotao: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
 });

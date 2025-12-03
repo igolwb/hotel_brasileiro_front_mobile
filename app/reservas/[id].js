@@ -15,7 +15,7 @@ export default function QuartoDetalhe() {
     if (id) {
       const fetchQuarto = async () => {
         try {
-            const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://test-back-7vih.onrender.com";
+            const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://scared-kristien-igoty1910-978c1b13.koyeb.app";
             const token = await AsyncStorage.getItem("authToken");
             const response = await fetch(`${API_URL}/api/quartos/${id}`, {
                 headers: {
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   detalhe: {
     color: "#fff",
     fontSize: 18,
-    marginBottom: 5,
+    marginBottom: 25,
     fontWeight: "regular",
   },
   botao: {

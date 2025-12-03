@@ -9,6 +9,7 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
+import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../../components/header";
 import BottomNav from "../../components/bottomNav";
@@ -48,7 +49,7 @@ export default function Home() {
   // Fetch rooms from the backend
   useEffect(() => {
     //troque o IP abaixo pelo IP da sua máquina, para descobrir o IP local veja no .env o processo
-    const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://test-back-7vih.onrender.com";
+    const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://scared-kristien-igoty1910-978c1b13.koyeb.app";
     fetch(`${API_URL}/api/quartos`)
       .then((res) => res.json())
       .then((data) => {
@@ -149,9 +150,9 @@ export default function Home() {
 				loop={true}
 				pagingEnabled={true}
 				snapEnabled={true}
-				width={width * 0.8}
+				width={width * 0.9}
 				style={{
-					width: width * 0.8,
+					width: width * 0.9,
           alignSelf: "center",
 				}}
 				mode="parallax"
@@ -175,9 +176,9 @@ export default function Home() {
 				loop={true}
 				pagingEnabled={true}
 				snapEnabled={true}
-				width={width * 0.8}
+				width={width * 0.9}
 				style={{
-					width: width * 0.8,
+					width: width * 0.9,
           alignSelf: "center",
 				}}
 				mode="parallax"
@@ -202,8 +203,9 @@ const styles = StyleSheet.create({
   },
   topImage: {
     width: "100%",
-    height: 215,
+    height: verticalScale(175),
     justifyContent: "flex-start",
+    marginBottom: 20,
   },
   overlayTextContainer: {
     padding: 20,
@@ -220,7 +222,7 @@ const styles = StyleSheet.create({
   },
   sectionencontros: {
     paddingHorizontal: 20,
-    height: 600,
+    height: 575,
   },
   sectionTitle: {
     fontSize: 24,
@@ -238,10 +240,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 12,
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+    boxShadowColor: "#000",
+    boxShadowOpacity: 0.2,
+    boxShadowRadius: 4,
+    boxShadowOffset: { width: 0, height: 2 },
 
   },
   roomImage: {

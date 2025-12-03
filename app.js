@@ -1,11 +1,50 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import NavegacaoStack from "./src/navegacao/NavegacaoStack";
+import * as Linking from "expo-linking";
+import RootLayout from "./app/_layout";
+
+const linking = {
+  prefixes: ["hotelbrasileiro://"], // Deep link scheme
+  config: {
+    screens: {
+      "(tabs)/index": "tabs/index",
+      "auth/Login": "auth/login",
+      "auth/Cadastro": "auth/cadastro",
+      "auth/RecuperarSenha": "auth/recuperar-senha",
+      "auth/pwconfirm": "auth/pwconfirm",
+      "home/home": "home",
+      "chat/chatPage": "chat/chat-page",
+      "reservas/quartoDesc": "reservas/quarto-desc",
+      "reservas/reserva": "reservas/reserva",
+      "reservas/reservaConfirm": "reservas/reserva-confirm",
+      "reservas/reservaFinish": "reservas/reserva-finish",
+      "user/userPage": "user/user-page",
+      "user/changepw": "user/change-pw",
+      "user/pwCode": "user/pw-code",
+      "user/confirmNewPw": "user/confirm-new-pw",
+      "+not-found": "not-found",
+    },
+  },
+};
 
 export default function App() {
+  useEffect(() => {
+    const handleDeepLink = (event) => {
+      const url = event.url;
+      console.log("Redirected URL:", url);
+      // Additional logic to handle the deep link can be added here
+    };
+
+    Linking.addEventListener("url", handleDeepLink);
+
+    return () => {
+      Linking.removeEventListener("url", handleDeepLink);
+    };
+  }, []);
+
   return (
-    <NavigationContainer>
-      <NavegacaoStack />
+    <NavigationContainer linking={linking}>
+      <RootLayout />
     </NavigationContainer>
   );
 }

@@ -1,14 +1,26 @@
 import React from "react";
-import { View, Image, StyleSheet } from "react-native";
+import { View, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
+import { useRouter } from "expo-router";
 
-export default function Header() {
+export default function HeaderChat() {
+  const router = useRouter();
+
   return (
     <View style={styles.header}>
       <Image
         source={require("../assets/images/Logo.png")}
         style={styles.image}
       />
+      <TouchableOpacity
+        onPress={() => router.push("/home/home")}
+        style={styles.homeButton}
+      >
+        <Image
+          source={require("../assets/images/voltarBtn.png")} // Replace with your actual image path
+          style={styles.homeButtonIcon}
+        />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -33,5 +45,14 @@ const styles = StyleSheet.create({
     height: 60,
     marginTop: verticalScale(20),
     marginLeft: scale(10),
+  },
+  homeButton: {
+    marginTop: verticalScale(29),
+    marginRight: scale(10),
+    padding: scale(5),
+  },
+  homeButtonIcon: {
+    width: scale(37),
+    height: scale(37),
   },
 });
