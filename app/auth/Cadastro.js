@@ -127,7 +127,7 @@ export default function Cadastro() {
     }
     setLoading(true);
     try {
-        const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://scared-kristien-igoty1910-978c1b13.koyeb.app";
+        const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://silent-delly-igoty1910-d4780979.koyeb.app";
         const response = await fetch(`${API_URL}/api/clientes`, {
             method: "POST",
             headers: {

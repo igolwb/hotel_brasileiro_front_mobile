@@ -47,7 +47,7 @@ export default function CodigoVerificacao() {
     setError("");
     setResendLoading(true);
     try {
-      const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://scared-kristien-igoty1910-978c1b13.koyeb.app";
+      const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://silent-delly-igoty1910-d4780979.koyeb.app";
       const response = await fetch(`${API_URL}/api/clientes/send-token`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -75,7 +75,7 @@ export default function CodigoVerificacao() {
       return;
     }
     try {
-      const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://scared-kristien-igoty1910-978c1b13.koyeb.app";
+      const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://silent-delly-igoty1910-d4780979.koyeb.app";
       // Buscar usuário pelo email para verificar token e expiração
       const response = await fetch(`${API_URL}/api/clientes/send-token-verify`, {
         method: "POST",

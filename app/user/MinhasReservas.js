@@ -10,7 +10,7 @@ const MinhasReservas = () => {
   const [error, setError] = useState(null);
   const router = useRouter();
 
-  const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://scared-kristien-igoty1910-978c1b13.koyeb.app';
+  const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://silent-delly-igoty1910-d4780979.koyeb.app';
 
   useEffect(() => {
     const fetchReservas = async () => {
