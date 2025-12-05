@@ -8,7 +8,6 @@ import {
   TextInput,
   ScrollView,
   Text,
-  SafeAreaView,
   StyleSheet,
   TouchableOpacity,
   ImageBackground,
@@ -38,18 +37,18 @@ export default function App() {
   if (error) return <Text>{error.message}</Text>;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <HeaderChat />
+    <KeyboardAvoidingView
+      style={styles.flex}
+      behavior={Platform.OS === 'android' ? 'height' : 'padding'}
+      keyboardVerticalOffset={verticalScale(57)} // adjust for your header height
+    >
+      <View style={styles.container}>
+        <HeaderChat />
 
-      <ImageBackground
-        source={require('../../assets/images/backgroundChat.png')}
-        style={styles.background}
-        resizeMode="cover"
-      >
-        <KeyboardAvoidingView
-          style={styles.flex}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={verticalScale(57)} // adjust for your header height
+        <ImageBackground
+          source={require('../../assets/images/backgroundChat.png')}
+          style={styles.background}
+          resizeMode="cover"
         >
           <View style={styles.chatContainer}>
             <ScrollView
@@ -80,7 +79,7 @@ export default function App() {
                   >
                     {m.parts.map((part, i) => (
                       <Text key={`${m.id}-${i}`} style={styles.messageText}>
-                        {part.text || ''}
+                        {part.type === 'text' ? part.text : ''}
                       </Text>
                     ))}
                   </View>
@@ -116,9 +115,9 @@ export default function App() {
               </TouchableOpacity>
             </View>
           </View>
-        </KeyboardAvoidingView>
-      </ImageBackground>
-    </SafeAreaView>
+        </ImageBackground>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 

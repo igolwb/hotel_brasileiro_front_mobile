@@ -166,8 +166,8 @@ export default function ReservaPage() {
       };
 
 const redirectUrls = {
-  success: 'hotelbrasileiro://reservas/reservaFinish',
-  failure: 'hotelbrasileiro://reservas/reservaFinish',
+  success: 'https://querulous-roberta-igoty1910-ebd088ba.koyeb.app/redirect/success',
+  failure: 'https://querulous-roberta-igoty1910-ebd088ba.koyeb.app/redirect/failure',
 };
 
       const paymentRes = await fetch(`${API_URL}/api/payments/create-checkout`, {

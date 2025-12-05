@@ -1,110 +1,90 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
-  Image,
-  ScrollView,
-} from 'react-native';
-import BottomNav from '../../components/bottomNav';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+  StyleSheet,
+  ImageBackground,
+} from "react-native";
+import { useRouter } from "expo-router";
 
 export default function ReservaFinish() {
   const router = useRouter();
-  const {
-    quartoNome,
-    quartoImage,
-    checkInDate,
-    checkOutDate,
-    guests,
-  } = useLocalSearchParams();
 
   return (
-    <View style={styles.container}>
-      <Image
-          source={{ uri: quartoImage }}
-          style={styles.imagem}
-          resizeMode="cover"
-      />
-      <ScrollView style={styles.info}>
-          <Text style={styles.titulo}>Reserva confirmada!</Text>
-          <Text style={styles.roomName}>{quartoNome}</Text>
+    <View style={{ flex: 1 }}>
+      {/* Top image with overlay */}
+      <View>
+        <ImageBackground
+          source={require("../../assets/images/imagemCadastro.png")}
+          style={styles.topImage}
+        >
+          <View style={styles.overlay} />
+        </ImageBackground>
+      </View>
 
-          <View style={styles.detailContainer}>
-            <Text style={styles.label}>Check-in:</Text>
-            <Text style={styles.value}>{checkInDate}</Text>
-          </View>
+      {/* Main container */}
+      <View style={styles.container}>
+        <Text style={styles.title}>Reserva Concluída!</Text>
+        <Text style={styles.description}>
+          A lua já sabe que você vem.
+          Prepare-se para um banho de estrelas.
+        </Text>
 
-          <View style={styles.detailContainer}>
-            <Text style={styles.label}>Check-out:</Text>
-            <Text style={styles.value}>{checkOutDate}</Text>
-          </View>
-          
-          <View style={styles.detailContainer}>
-            <Text style={styles.label}>Hóspedes:</Text>
-            <Text style={styles.value}>{guests}</Text>
-          </View>
-
-          <TouchableOpacity style={styles.botao} onPress={() => router.push('/home/home')}>
-              <Text style={styles.textoBotao}>Voltar para o início</Text>
-          </TouchableOpacity>
-      </ScrollView>
-      <BottomNav />
+        {/* Button to go back to home */}
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => router.push("/home/home")}
+        >
+          <Text style={styles.buttonText}>Voltar para o início</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  topImage: {
+    width: "100%",
+    height: 376,
+    resizeMode: "cover",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.4)",
+  },
   container: {
-      flex: 1,
-      backgroundColor: '#13293D',
+    flex: 1,
+    paddingHorizontal: 20,
+    backgroundColor: "#0B2A3A",
+    justifyContent: "flex-start",
+    paddingTop: 50,
   },
-  imagem: {
-      width: '100%',
-      height: '40%',
+  title: {
+    padding: 20,
+    marginTop: 10,
+    fontSize: 20,
+    color: "#FFF",
+    marginVertical: 15,
+    fontWeight: "intermediate",
+    alignSelf: "center",
   },
-  info: {
-      flex: 1,
-      backgroundColor: '#142c42',
-      padding: 20,
-      marginTop: -20,
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
+  description: {
+    color: "#E8F1F2",
+    fontSize: 15,
+    marginBottom: 30,
+    textAlign: "center",
   },
-  titulo: {
-      color: '#fff',
-      fontWeight: 'bold',
-      fontSize: 24,
-      marginBottom: 8,
+  button: {
+    backgroundColor: "#006494",
+    borderRadius: 10,
+    paddingVertical: 16,
+    alignItems: "center",
+    marginBottom: 25,
   },
-  roomName: {
-    fontSize: 18,
-    color: '#fff',
-    marginBottom: 20,
-  },
-  detailContainer: {
-    marginBottom: 15,
-  },
-  label: {
-      color: '#a0aec0',
-      fontSize: 16,
-      marginBottom: 4,
-  },
-  value: {
-      color: '#fff',
-      fontSize: 18,
-  },
-  botao: {
-      backgroundColor: '#006494',
-      borderRadius: 12,
-      paddingVertical: 14,
-      marginTop: 40,
-      alignItems: 'center',
-  },
-  textoBotao: {
-      color: '#fff',
-      fontWeight: 'bold',
-      fontSize: 16,
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
