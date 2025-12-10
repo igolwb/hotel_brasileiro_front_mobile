@@ -101,64 +101,44 @@ export default function Cadastro() {
   // Envia o formulário para criar um novo cliente
   const handleSubmit = async () => {
     setError("");
-    setSuccess("");
-    setShowPasswordRequirements(false);
-    if (!nome || !email || !telefone || !senha || !confirmSenha) {
-        setError("Por favor, preencha todos os campos.");
-        return;
-    }
-    if (!emailRegex.test(email)) {
-        setError("Email inválido.");
-        return;
-    }
-    if (!phoneRegex.test(telefone)) {
-        setError("Telefone inválido. Use o formato (XX) XXXXX-XXXX.");
-        return;
-    }
-    if (senha !== confirmSenha) {
-        setError("As senhas não coincidem.");
-        return;
-    }
-    const failedReqs = passwordRequirements.filter(r => !r.test(senha));
-    if (failedReqs.length > 0) {
-        setError("Senha inválida. Veja os requisitos abaixo.");
-        setShowPasswordRequirements(true);
-        return;
-    }
     setLoading(true);
+
+    if (!nome || !email || !telefone || !senha || !confirmSenha) {
+      setError("Preencha todos os campos.");
+      setLoading(false);
+      return;
+    }
+
+    if (senha !== confirmSenha) {
+      setError("As senhas não coincidem.");
+      setLoading(false);
+      return;
+    }
+
     try {
-        const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://hotel-brasileiro-back-mobile.onrender.com";
-        const response = await fetch(`${API_URL}/api/clientes`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ nome, email, telefone, senha })
-        });
+      const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://hotel-brasileiro-back-mobile.onrender.com";
+      const response = await fetch(`${API_URL}/api/clientes/send-confirmation-code`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome, email, telefone, senha }),
+      });
 
-        const data = await response.json();
-        console.log("Backend Response:", data); // Debugging
+      const data = await response.json();
 
-        if (data.success && data.token) {
-            await AsyncStorage.setItem('authToken', data.token);
-            console.log("Token stored successfully");
-            // Decode token and store UserId and UserName
-            const decodedToken = decodeToken(data.token);
-            console.log("Decoded Token:", decodedToken);
-            await AsyncStorage.setItem('UserId', decodedToken.id.toString());
-            if (decodedToken.nome) {
-                await AsyncStorage.setItem('UserName', decodedToken.nome.toString());
-            }
-            setSuccess("Cadastro realizado com sucesso!");
-            setTimeout(() => router.push("/home/home"), 1500);
-        } else {
-            setError(data.message || "Erro ao cadastrar. Tente novamente.");
-        }
+      if (response.ok && data.success) {
+        await AsyncStorage.setItem(
+          "userInfo",
+          JSON.stringify({ nome, email, telefone, senha })
+        );
+        setSuccess("Código enviado para o email.");
+        router.push("/auth/Confirmacao");
+      } else {
+        setError(data.message || "Erro ao enviar código de confirmação.");
+      }
     } catch (err) {
-        console.error("Erro ao cadastrar:", err);
-        setError("Erro ao cadastrar. Tente novamente.");
+      setError("Erro de conexão. Tente novamente.");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 

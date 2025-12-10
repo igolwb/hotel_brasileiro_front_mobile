@@ -26,6 +26,7 @@ export default function RootLayout() {
         {/*  Fluxo de autenticação */}
         <Stack.Screen name="auth/Login" />
         <Stack.Screen name="auth/Cadastro" />
+        <Stack.Screen name="auth/Confirmacao" />
         <Stack.Screen name="auth/RecuperarSenha" />
         <Stack.Screen name="auth/pwconfirm" />
         <Stack.Screen name="home/home" />
