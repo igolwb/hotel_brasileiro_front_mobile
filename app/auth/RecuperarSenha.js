@@ -27,7 +27,7 @@ export default function RecuperarSenha() {
 
     setLoading(true);
     try {
-      const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://silent-delly-igoty1910-d4780979.koyeb.app";
+      const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://hotel-brasileiro-back-mobile.onrender.com";
       const response = await fetch(`${API_URL}/api/clientes/send-token`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

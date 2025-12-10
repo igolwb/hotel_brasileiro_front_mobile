@@ -12,7 +12,7 @@ export default function EditUser() {
 	const [phone, setPhone] = useState("");
     const [userId, setUserId] = useState(null);
 
-    const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://silent-delly-igoty1910-d4780979.koyeb.app';
+    const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://hotel-brasileiro-back-mobile.onrender.com';
     // Placeholder for user photo, replace with actual image path or URL if available
     const userPhoto = require("../../assets/images/user_pfp.png");
 

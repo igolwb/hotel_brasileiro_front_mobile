@@ -49,7 +49,7 @@ export default function Home() {
   // Fetch rooms from the backend
   useEffect(() => {
     //troque o IP abaixo pelo IP da sua máquina, para descobrir o IP local veja no .env o processo
-    const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://silent-delly-igoty1910-d4780979.koyeb.app";
+    const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://hotel-brasileiro-back-mobile.onrender.com";
     fetch(`${API_URL}/api/quartos`)
       .then((res) => res.json())
       .then((data) => {

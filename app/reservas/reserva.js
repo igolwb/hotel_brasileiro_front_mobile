@@ -35,7 +35,7 @@ export default function ReservaPage() {
     if (id) {
       const fetchQuarto = async () => {
         try {
-          const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://silent-delly-igoty1910-d4780979.koyeb.app';
+          const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://hotel-brasileiro-back-mobile.onrender.com';
           const token = await AsyncStorage.getItem('authToken');
           const response = await fetch(`${API_URL}/api/quartos/${id}`, {
             headers: {
@@ -121,7 +121,7 @@ export default function ReservaPage() {
     }
 
     try {
-      const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://silent-delly-igoty1910-d4780979.koyeb.app';
+      const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://hotel-brasileiro-back-mobile.onrender.com';
       const token = await AsyncStorage.getItem('authToken');
 
       // Step 1: Create reservation in the database
@@ -166,8 +166,8 @@ export default function ReservaPage() {
       };
 
 const redirectUrls = {
-  success: 'https://querulous-roberta-igoty1910-ebd088ba.koyeb.app/redirect/success',
-  failure: 'https://querulous-roberta-igoty1910-ebd088ba.koyeb.app/redirect/failure',
+  success: 'https://redirecturl-ppv3.onrender.com/redirect/success',
+  failure: 'https://redirecturl-ppv3.onrender.com/redirect/failure',
 };
 
       const paymentRes = await fetch(`${API_URL}/api/payments/create-checkout`, {

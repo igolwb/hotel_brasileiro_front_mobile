@@ -10,7 +10,7 @@ const MinhasReservas = () => {
   const [error, setError] = useState(null);
   const router = useRouter();
 
-  const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://silent-delly-igoty1910-d4780979.koyeb.app';
+  const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://hotel-brasileiro-back-mobile.onrender.com';
 
   useEffect(() => {
     const fetchReservas = async () => {

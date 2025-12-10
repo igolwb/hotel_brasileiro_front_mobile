@@ -15,7 +15,7 @@ export default function QuartoDetalhe() {
     if (id) {
       const fetchQuarto = async () => {
         try {
-            const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://silent-delly-igoty1910-d4780979.koyeb.app";
+            const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://hotel-brasileiro-back-mobile.onrender.com";
             const token = await AsyncStorage.getItem("authToken");
             const response = await fetch(`${API_URL}/api/quartos/${id}`, {
                 headers: {
